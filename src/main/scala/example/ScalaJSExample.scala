@@ -1,9 +1,10 @@
 package example
 
-import scala.scalajs.js.annotation.JSExport
-import scala.scalajs.js.timers.RawTimers
 import org.scalajs.dom
 import org.scalajs.dom.html
+
+import scala.scalajs.js.JSApp
+import scala.scalajs.js.timers.RawTimers
 import scala.util.Random
 
 case class Point(x: Int, y: Int) {
@@ -12,10 +13,10 @@ case class Point(x: Int, y: Int) {
   def /(d: Int) = Point(x / d, y / d)
 }
 
-@JSExport
-object ScalaJSExample {
-  @JSExport
-  def main(canvas: html.Canvas): Unit = {
+object ScalaJSExample extends JSApp {
+  def main(): Unit = {
+    val canvas = dom.document.getElementById("canvas")
+      .asInstanceOf[html.Canvas]
     val ctx = canvas.getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
 
@@ -42,7 +43,7 @@ object ScalaJSExample {
       val b = p.y
       ctx.fillStyle = s"rgb($g, $r, $b)"
 
-      ctx.fillRect(p.x, p.y, 1, 1)
+      ctx.fillRect(p.x, p.y, 2, 2)
     }
 
     //    dom.setInterval(() => run(), 50)

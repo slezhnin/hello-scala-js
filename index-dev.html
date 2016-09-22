@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>The Scala.js Tutorial</title>
+    <title>Example Scala.js application</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
-<body>
+<body style="margin: 0">
+
+<div>
+    <canvas style="display: block" id="canvas" width="500" height="500"></canvas>
+</div>
+
 <!-- Include JavaScript dependencies -->
 <script type="text/javascript" src="./target/scala-2.11/scala-js-playground-jsdeps.js"></script>
 <!-- Include Scala.js compiled code -->
 <script type="text/javascript" src="./target/scala-2.11/scala-js-playground-fastopt.js"></script>
 <!-- Run JSApp -->
 <script type="text/javascript" src="./target/scala-2.11/scala-js-playground-launcher.js"></script>
-<!-- Run tutorial.webapp.TutorialApp -->
-<!--<script type="text/javascript">-->
-<!--tutorial.webapp.TutorialApp().main();-->
+<!--<script>-->
+    <!--example.ScalaJSExample().main(document.getElementById('canvas'));-->
 <!--</script>-->
-<button id="click-me-button" type="button"
-        onclick="tutorial.webapp.TutorialApp().addClickedMessage()">Click me!
-</button>
 </body>
 </html>
