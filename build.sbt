@@ -8,15 +8,11 @@ lazy val root = (project in file("."))
   )
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.0",
-      "be.doeraene" %%% "scalajs-jquery" % "0.9.0",
-      "com.lihaoyi" %%% "utest" % "0.3.0" % "test"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
     )
   )
-  .settings(testFrameworks += new TestFramework("utest.runner.Framework"))
   .settings(
     skip in packageJSDependencies := false,
-    jsDependencies += "org.webjars" % "jquery" % "2.1.4" / "2.1.4/jquery.js",
     jsDependencies += RuntimeDOM
   )
   .settings(
