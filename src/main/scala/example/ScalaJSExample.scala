@@ -1,51 +1,42 @@
 package example
 
-import scala.scalajs.js.annotation.JSExport
-import scala.scalajs.js.timers.RawTimers
 import org.scalajs.dom
 import org.scalajs.dom.html
-import scala.util.Random
 
-case class Point(x: Int, y: Int) {
-  def +(p: Point) = Point(x + p.x, y + p.y)
+import scala.scalajs.js.JSApp
 
-  def /(d: Int) = Point(x / d, y / d)
-}
+object ScalaJSExample extends JSApp {
 
-@JSExport
-object ScalaJSExample {
-  @JSExport
-  def main(canvas: html.Canvas): Unit = {
-    val ctx = canvas.getContext("2d")
+  def main(): Unit = {
+    val canvas = dom.document.getElementById("canvas")
+      .asInstanceOf[html.Canvas]
+    val renderer = canvas.getContext("2d")
       .asInstanceOf[dom.CanvasRenderingContext2D]
 
-    val W = ctx.canvas.width
-    val W2 = W / 2 + 1
-    val H = ctx.canvas.height
-    var count = 0
-    var p = Point(0, 0)
-    val corners = Seq(Point(W, H), Point(0, H), Point(W2, 0))
+    canvas.width = dom.window.innerWidth
+    canvas.height = dom.window.innerHeight
 
-    def clear() = {
-      ctx.fillStyle = "black"
-      ctx.fillRect(0, 0, W, H)
+    renderer.fillStyle = "#f8f8f8"
+    renderer.fillRect(0, 0, canvas.width, canvas.height)
+
+    renderer.fillStyle = "black"
+    var down = false
+    canvas.onmousedown =
+      (e: dom.MouseEvent) => down = true
+
+    canvas.onmouseup =
+      (e: dom.MouseEvent) => down = false
+
+    val rect = canvas.getBoundingClientRect()
+
+    canvas.onmousemove = {
+      (e: dom.MouseEvent) => if (down) {
+        renderer.fillRect(
+          e.clientX - rect.left,
+          e.clientY - rect.top,
+          5, 5
+        )
+      }
     }
-
-    def run() = for (i <- 0 until 10) {
-      if (count % 3000 == 0) clear()
-      count += 1
-      p = (p + corners(Random.nextInt(3))) / 2
-
-      val height = (H * 2).toFloat / (H + p.y)
-      val r = (p.x * height).toInt
-      val g = ((H - p.x) * height).toInt
-      val b = p.y
-      ctx.fillStyle = s"rgb($g, $r, $b)"
-
-      ctx.fillRect(p.x, p.y, 1, 1)
-    }
-
-    //    dom.setInterval(() => run(), 50)
-    RawTimers.setInterval(() => run(), 50)
   }
 }
