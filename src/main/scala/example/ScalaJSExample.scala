@@ -4,49 +4,134 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 
 import scala.scalajs.js.JSApp
-import scala.scalajs.js.timers.RawTimers
-import scala.util.Random
-
-case class Point(x: Int, y: Int) {
-  def +(p: Point) = Point(x + p.x, y + p.y)
-
-  def /(d: Int) = Point(x / d, y / d)
-}
+import scalatags.JsDom.all._
 
 object ScalaJSExample extends JSApp {
   def main(): Unit = {
-    val canvas = dom.document.getElementById("canvas")
-      .asInstanceOf[html.Canvas]
-    val ctx = canvas.getContext("2d")
-      .asInstanceOf[dom.CanvasRenderingContext2D]
+    hello()
+    userInput()
+    search()
+    searchHi()
+    weather()
+  }
 
-    val W = ctx.canvas.width
-    val W2 = W / 2 + 1
-    val H = ctx.canvas.height
-    var count = 0
-    var p = Point(0, 0)
-    val corners = Seq(Point(W, H), Point(0, H), Point(W2, 0))
+  def hello(): Unit = {
+    val target = dom.document.getElementById("hello")
+      .asInstanceOf[html.Div]
+    val (animalA, animalB) = ("fox", "dog")
+    target.appendChild(
+      div(
+        h2("Hello, World!"),
+        p(
+          "The quick brown ", b(animalA),
+          " jumps over the lazy ", i(animalB), "."
+        )
+      ).render
+    )
+  }
 
-    def clear() = {
-      ctx.fillStyle = "black"
-      ctx.fillRect(0, 0, W, H)
+  def userInput(): Unit = {
+    val target = dom.document.getElementById("userInput")
+      .asInstanceOf[html.Div]
+    val box = input(
+      `type` := "text",
+      placeholder := "Type here!"
+    ).render
+    val output = span.render
+    box.onkeyup = (e: dom.Event) => {
+      output.textContent = box.value.toUpperCase
     }
+    target.appendChild(
+      div(
+        h2("Capital Box"),
+        p("Type here and have it capitalized!"),
+        div(box),
+        div(output)
+      ).render
+    )
+  }
 
-    def run() = for (i <- 0 until 10) {
-      if (count % 3000 == 0) clear()
-      count += 1
-      p = (p + corners(Random.nextInt(3))) / 2
-
-      val height = (H * 2).toFloat / (H + p.y)
-      val r = (p.x * height).toInt
-      val g = ((H - p.x) * height).toInt
-      val b = p.y
-      ctx.fillStyle = s"rgb($g, $r, $b)"
-
-      ctx.fillRect(p.x, p.y, 2, 2)
+  def searchRender(renderListing: (html.Input, Seq[String]) => dom.Element, listing: Seq[String]): Unit = {
+    val target = dom.document.getElementById("search")
+      .asInstanceOf[html.Div]
+    val box = input(
+      `type` := "text",
+      placeholder := "Type here!"
+    ).render
+    val output = div(renderListing(box, listing)).render
+    box.onkeyup = (e: dom.Event) => {
+      output.innerHTML = ""
+      output.appendChild(renderListing(box, listing))
     }
+    target.appendChild(
+      div(
+        h2("Search Box"),
+        p("Type here to filter the list of things below!"),
+        div(box),
+        output
+      ).render
+    )
+  }
 
-    //    dom.setInterval(() => run(), 50)
-    RawTimers.setInterval(() => run(), 50)
+  def search(): Unit = {
+    searchRender((box: html.Input, listing: Seq[String]) => ul(
+      for {
+        fruit <- listing
+        if fruit.toLowerCase.startsWith(
+          box.value.toLowerCase
+        )
+      } yield li(fruit)
+    ).render, Seq(
+      "Apple", "Apricot", "Banana", "Cherry",
+      "Mango", "Mangosteen", "Mandarin",
+      "Grape", "Grapefruit", "Guava"
+    ))
+  }
+
+  def searchHi(): Unit = {
+    searchRender((box: html.Input, listing: Seq[String]) => ul(
+      for {
+        fruit <- Seq(
+          "Apple", "Apricot", "Banana", "Cherry",
+          "Mango", "Mangosteen", "Mandarin",
+          "Grape", "Grapefruit", "Guava"
+        )
+        if fruit.toLowerCase.startsWith(
+          box.value.toLowerCase
+        )
+      } yield {
+        val (first, last) = fruit.splitAt(box.value.length)
+        li(
+          span(
+            backgroundColor := "yellow",
+            first
+          ),
+          last)
+      }
+    ).render, Seq(
+      "Apple", "Apricot", "Banana", "Cherry",
+      "Mango", "Mangosteen", "Mandarin",
+      "Grape", "Grapefruit", "Guava"
+    ))
+  }
+
+  def weather(): Unit = {
+    import dom.ext._
+
+    import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+    val target = dom.document.getElementById("weather")
+      .asInstanceOf[html.Div]
+    val url = "http://api.openweathermap.org/data/2.5/weather?q=Singapore"
+    val get = Ajax.get(url)
+    get.onFailure { case t =>
+      target.appendChild(
+        pre("Error: " + t).render
+      )
+    }
+    get.onSuccess { case xhr =>
+      target.appendChild(
+        pre(xhr.responseText).render
+      )
+    }
   }
 }

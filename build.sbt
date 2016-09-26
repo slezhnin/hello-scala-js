@@ -8,7 +8,8 @@ lazy val root = (project in file("."))
   )
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.0",
+      "com.lihaoyi" %%% "scalatags" % "0.4.6"
     )
   )
   .settings(
